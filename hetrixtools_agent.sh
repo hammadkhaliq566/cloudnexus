@@ -1,22 +1,4 @@
 #!/bin/bash
-#
-#
-#	HetrixTools Server Monitoring Agent
-#	Copyright 2015 - 2023 @  HetrixTools
-#	For support, please open a ticket on our website https://hetrixtools.com
-#
-#
-#		DISCLAIMER OF WARRANTY
-#
-#	The Software is provided "AS IS" and "WITH ALL FAULTS," without warranty of any kind, 
-#	including without limitation the warranties of merchantability, fitness for a particular purpose and non-infringement. 
-#	HetrixTools makes no warranty that the Software is free of defects or is suitable for any particular purpose. 
-#	In no event shall HetrixTools be responsible for loss or damages arising from the installation or use of the Software, 
-#	including but not limited to any indirect, punitive, special, incidental or consequential damages of any character including, 
-#	without limitation, damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses. 
-#	The entire risk as to the quality and performance of the Software is borne by you, the user.
-#
-#		END OF DISCLAIMER OF WARRANTY
 
 # Set PATH/Locale
 export LC_NUMERIC="en_US.UTF-8"
@@ -27,9 +9,9 @@ ScriptPath=$(dirname "${BASH_SOURCE[0]}")
 Version="2.0.10"
 
 # Load configuration file
-if [ -f "$ScriptPath"/hetrixtools.cfg ]
+if [ -f "$ScriptPath"/cloudnexus.cfg ]
 then
-	. "$ScriptPath"/hetrixtools.cfg
+	. "$ScriptPath"/cloudnexus.cfg
 else
 	exit 1
 fi
@@ -64,16 +46,16 @@ function base64prep() {
 }
 
 # Kill any lingering agent processes
-HTProcesses=$(pgrep -f hetrixtools_agent.sh | wc -l)
+HTProcesses=$(pgrep -f cloudnexus_agent.sh | wc -l)
 if [ -z "$HTProcesses" ]
 then
 	HTProcesses=0
 fi
 if [ "$HTProcesses" -gt 15 ]
 then
-	pgrep -f hetrixtools_agent.sh | xargs kill -9
+	pgrep -f cloudnexus_agent.sh | xargs kill -9
 fi
-for PID in $(pgrep -f hetrixtools_agent.sh)
+for PID in $(pgrep -f cloudnexus_agent.sh)
 do
 	PID_TIME=$(ps -p "$PID" -oetime= | tr '-' ':' | awk -F: '{total=0; m=1;} {for (i=0; i < NF; i++) {total += $(NF-i)*m; m *= i >= 2 ? 24 : 60 }} {print total}')
 	if [ -n "$PID_TIME" ] && [ "$PID_TIME" -ge 120 ]
@@ -89,8 +71,8 @@ M=$(date +%M | sed 's/^0*//')
 if [ -z "$M" ]
 then
 	M=0
-	# Clear the hetrixtools_cron.log every hour
-	rm -f "$ScriptPath"/hetrixtools_cron.log
+	# Clear the cloudnexus_cron.log every hour
+	rm -f "$ScriptPath"/cloudnexus_cron.log
 fi
 
 # Network interfaces
@@ -652,7 +634,7 @@ json='{"version":"'"$Version"'","SID":"'"$SID"'","agent":"0","user":"'"$User"'",
 jsoncomp=$(echo -ne "$json" | gzip -cf | base64 -w 0 | sed 's/ //g' | sed 's/\//%2F/g' | sed 's/+/%2B/g')
 
 # Save data to file
-echo "j=$jsoncomp" > "$ScriptPath"/hetrixtools_agent.log
+echo "j=$jsoncomp" > "$ScriptPath"/cloudnexus_agent.log
 
 # Post data
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --post-file="$ScriptPath/hetrixtools_agent.log" "$SecuredConnection" https://sm.hetrixtools.net/v2/ &> /dev/null
+# wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --post-file="$ScriptPath/cloudnexus_agent.log" "$SecuredConnection" https://sm.cloudnexus.net/v2/ &> /dev/null

@@ -1,22 +1,4 @@
 #!/bin/bash
-#
-#
-#	HetrixTools Server Monitoring Agent - Install Script
-#	Copyright 2015 - 2023 @  HetrixTools
-#	For support, please open a ticket on our website https://hetrixtools.com
-#
-#
-#		DISCLAIMER OF WARRANTY
-#
-#	The Software is provided "AS IS" and "WITH ALL FAULTS," without warranty of any kind, 
-#	including without limitation the warranties of merchantability, fitness for a particular purpose and non-infringement. 
-#	HetrixTools makes no warranty that the Software is free of defects or is suitable for any particular purpose. 
-#	In no event shall HetrixTools be responsible for loss or damages arising from the installation or use of the Software, 
-#	including but not limited to any indirect, punitive, special, incidental or consequential damages of any character including, 
-#	without limitation, damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses. 
-#	The entire risk as to the quality and performance of the Software is borne by you, the user.
-#
-#
 
 # Set PATH
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -43,7 +25,7 @@ if [ -z "$SID" ]
 fi
 echo "... done."
 
-# Check if user has selected to run agent as 'root' or as 'hetrixtools' user
+# Check if user has selected to run agent as 'root' or as 'cloudnexus' user
 if [ -z "$2" ]
 	then echo "ERROR: Second parameter missing."
 	exit
@@ -56,34 +38,34 @@ command -v wget >/dev/null 2>&1 || { echo "ERROR: wget is required to run this a
 echo "... done."
 
 # Remove old agent (if exists)
-echo "Checking if there's any old hetrixtools agent already installed..."
-if [ -d /etc/hetrixtools ]
+echo "Checking if there's any old cloudnexus agent already installed..."
+if [ -d /etc/cloudnexus ]
 then
-	echo "Old hetrixtools agent found, deleting it..."
-	rm -rf /etc/hetrixtools
+	echo "Old cloudnexus agent found, deleting it..."
+	rm -rf /etc/cloudnexus
 else
-	echo "No old hetrixtools agent found..."
+	echo "No old cloudnexus agent found..."
 fi
 echo "... done."
 
 # Creating agent folder
-echo "Creating the hetrixtools agent folder..."
-mkdir -p /etc/hetrixtools
+echo "Creating the cloudnexus agent folder..."
+mkdir -p /etc/cloudnexus
 echo "... done."
 
 # Fetching the agent
 echo "Fetching the agent..."
-wget -t 1 -T 30 -qO /etc/hetrixtools/hetrixtools_agent.sh https://raw.githubusercontent.com/hetrixtools/agent/$BRANCH/hetrixtools_agent.sh
+wget -t 1 -T 30 -qO /etc/cloudnexus/cloudnexus_agent.sh https://raw.githubusercontent.com/cloudnexus/agent/$BRANCH/cloudnexus_agent.sh
 echo "... done."
 
 # Fetching the config file
 echo "Fetching the config file..."
-wget -t 1 -T 30 -qO /etc/hetrixtools/hetrixtools.cfg https://raw.githubusercontent.com/hetrixtools/agent/$BRANCH/hetrixtools.cfg
+wget -t 1 -T 30 -qO /etc/cloudnexus/cloudnexus.cfg https://raw.githubusercontent.com/cloudnexus/agent/$BRANCH/cloudnexus.cfg
 echo "... done."
 
 # Inserting Server ID (SID) into the agent config
 echo "Inserting Server ID (SID) into agent config..."
-sed -i "s/SID=\"\"/SID=\"$SID\"/" /etc/hetrixtools/hetrixtools.cfg
+sed -i "s/SID=\"\"/SID=\"$SID\"/" /etc/cloudnexus/cloudnexus.cfg
 echo "... done."
 
 # Check if any services are to be monitored
@@ -91,7 +73,7 @@ echo "Checking if any services should be monitored..."
 if [ "$3" != "0" ]
 then
 	echo "Services found, inserting them into the agent config..."
-	sed -i "s/CheckServices=\"\"/CheckServices=\"$3\"/" /etc/hetrixtools/hetrixtools.cfg
+	sed -i "s/CheckServices=\"\"/CheckServices=\"$3\"/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 
@@ -100,7 +82,7 @@ echo "Checking if software RAID should be monitored..."
 if [ "$4" -eq "1" ]
 then
 	echo "Enabling software RAID monitoring in the agent config..."
-	sed -i "s/CheckSoftRAID=0/CheckSoftRAID=1/" /etc/hetrixtools/hetrixtools.cfg
+	sed -i "s/CheckSoftRAID=0/CheckSoftRAID=1/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 
@@ -109,7 +91,7 @@ echo "Checking if Drive Health should be monitored..."
 if [ "$5" -eq "1" ]
 then
 	echo "Enabling Drive Health monitoring in the agent config..."
-	sed -i "s/CheckDriveHealth=0/CheckDriveHealth=1/" /etc/hetrixtools/hetrixtools.cfg
+	sed -i "s/CheckDriveHealth=0/CheckDriveHealth=1/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 
@@ -118,7 +100,7 @@ echo "Checking if 'View running processes' should be enabled..."
 if [ "$6" -eq "1" ]
 then
 	echo "Enabling 'View running processes' in the agent config..."
-	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/hetrixtools/hetrixtools.cfg
+	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 
@@ -127,52 +109,52 @@ echo "Checking if any ports to monitor number of connections on..."
 if [ "$7" != "0" ]
 then
 	echo "Ports found, inserting them into the agent config..."
-	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$7\"/" /etc/hetrixtools/hetrixtools.cfg
+	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$7\"/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 
-# Killing any running hetrixtools agents
-echo "Making sure no hetrixtools agent scripts are currently running..."
-ps aux | grep -ie hetrixtools_agent.sh | awk '{print $2}' | xargs kill -9
+# Killing any running cloudnexus agents
+echo "Making sure no cloudnexus agent scripts are currently running..."
+ps aux | grep -ie cloudnexus_agent.sh | awk '{print $2}' | xargs kill -9
 echo "... done."
 
-# Checking if hetrixtools user exists
-echo "Checking if hetrixtools user already exists..."
-if id -u hetrixtools >/dev/null 2>&1
+# Checking if cloudnexus user exists
+echo "Checking if cloudnexus user already exists..."
+if id -u cloudnexus >/dev/null 2>&1
 then
-	echo "The hetrixtools user already exists, killing its processes..."
-	pkill -9 -u `id -u hetrixtools`
-	echo "Deleting hetrixtools user..."
-	userdel hetrixtools
-	echo "Creating the new hetrixtools user..."
-	useradd hetrixtools -r -d /etc/hetrixtools -s /bin/false
-	echo "Assigning permissions for the hetrixtools user..."
-	chown -R hetrixtools:hetrixtools /etc/hetrixtools
-	chmod -R 700 /etc/hetrixtools
+	echo "The cloudnexus user already exists, killing its processes..."
+	pkill -9 -u `id -u cloudnexus`
+	echo "Deleting cloudnexus user..."
+	userdel cloudnexus
+	echo "Creating the new cloudnexus user..."
+	useradd cloudnexus -r -d /etc/cloudnexus -s /bin/false
+	echo "Assigning permissions for the cloudnexus user..."
+	chown -R cloudnexus:cloudnexus /etc/cloudnexus
+	chmod -R 700 /etc/cloudnexus
 else
-	echo "The hetrixtools user doesn't exist, creating it now..."
-	useradd hetrixtools -r -d /etc/hetrixtools -s /bin/false
-	echo "Assigning permissions for the hetrixtools user..."
-	chown -R hetrixtools:hetrixtools /etc/hetrixtools
-	chmod -R 700 /etc/hetrixtools
+	echo "The cloudnexus user doesn't exist, creating it now..."
+	useradd cloudnexus -r -d /etc/cloudnexus -s /bin/false
+	echo "Assigning permissions for the cloudnexus user..."
+	chown -R cloudnexus:cloudnexus /etc/cloudnexus
+	chmod -R 700 /etc/cloudnexus
 fi
 echo "... done."
 
 # Removing old cronjob (if exists)
-echo "Removing any old hetrixtools cronjob, if exists..."
-crontab -u root -l | grep -v 'hetrixtools_agent.sh'  | crontab -u root - >/dev/null 2>&1
-crontab -u hetrixtools -l | grep -v 'hetrixtools_agent.sh'  | crontab -u hetrixtools - >/dev/null 2>&1
+echo "Removing any old cloudnexus cronjob, if exists..."
+crontab -u root -l | grep -v 'cloudnexus_agent.sh'  | crontab -u root - >/dev/null 2>&1
+crontab -u cloudnexus -l | grep -v 'cloudnexus_agent.sh'  | crontab -u cloudnexus - >/dev/null 2>&1
 echo "... done."
 
-# Setup the new cronjob to run the agent either as 'root' or as 'hetrixtools' user, depending on client's installation choice.
-# Default is running the agent as 'hetrixtools' user, unless chosen otherwise by the client when fetching the installation code from the hetrixtools website.
+# Setup the new cronjob to run the agent either as 'root' or as 'cloudnexus' user, depending on client's installation choice.
+# Default is running the agent as 'cloudnexus' user, unless chosen otherwise by the client when fetching the installation code from the cloudnexus website.
 if [ "$2" -eq "1" ]
 then
 	echo "Setting up the new cronjob as 'root' user..."
-	crontab -u root -l 2>/dev/null | { cat; echo "* * * * * bash /etc/hetrixtools/hetrixtools_agent.sh >> /etc/hetrixtools/hetrixtools_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
+	crontab -u root -l 2>/dev/null | { cat; echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
 else
-	echo "Setting up the new cronjob as 'hetrixtools' user..."
-	crontab -u hetrixtools -l 2>/dev/null | { cat; echo "* * * * * bash /etc/hetrixtools/hetrixtools_agent.sh >> /etc/hetrixtools/hetrixtools_cron.log 2>&1"; } | crontab -u hetrixtools - >/dev/null 2>&1
+	echo "Setting up the new cronjob as 'cloudnexus' user..."
+	crontab -u cloudnexus -l 2>/dev/null | { cat; echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u cloudnexus - >/dev/null 2>&1
 fi
 echo "... done."
 
@@ -184,22 +166,22 @@ then
 fi
 echo "... done."
 
-# Let HetrixTools platform know install has been completed
-echo "Letting HetrixTools platform know the installation has been completed..."
-POST="v=install&s=$SID"
-wget -t 1 -T 30 -qO- --post-data "$POST" https://sm.hetrixtools.net/ &> /dev/null
-echo "... done."
+# Let cloudnexus platform know install has been completed
+# echo "Letting cloudnexus platform know the installation has been completed..."
+# POST="v=install&s=$SID"
+# wget -t 1 -T 30 -qO- --post-data "$POST" https://sm.cloudnexus.net/ &> /dev/null
+# echo "... done."
 
 # Start the agent
-if [ "$2" -eq "1" ]
-then
-	echo "Starting the agent under the 'root' user..."
-	bash /etc/hetrixtools/hetrixtools_agent.sh > /dev/null 2>&1 &
-else
-	echo "Starting the agent under the 'hetrixtools' user..."
-	sudo -u hetrixtools bash /etc/hetrixtools/hetrixtools_agent.sh > /dev/null 2>&1 &
-fi
-echo "... done."
+# if [ "$2" -eq "1" ]
+# then
+# 	echo "Starting the agent under the 'root' user..."
+# 	bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
+# else
+# 	echo "Starting the agent under the 'cloudnexus' user..."
+# 	sudo -u cloudnexus bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
+# fi
+# echo "... done."
 
 # All done
-echo "HetrixTools agent installation completed."
+echo "cloudnexus agent installation completed."

@@ -1,22 +1,4 @@
 #!/bin/bash
-#
-#
-#	HetrixTools Server Monitoring Agent - Uninstall Script
-#	Copyright 2015 - 2023 @  HetrixTools
-#	For support, please open a ticket on our website https://hetrixtools.com
-#
-#
-#		DISCLAIMER OF WARRANTY
-#
-#	The Software is provided "AS IS" and "WITH ALL FAULTS," without warranty of any kind, 
-#	including without limitation the warranties of merchantability, fitness for a particular purpose and non-infringement. 
-#	HetrixTools makes no warranty that the Software is free of defects or is suitable for any particular purpose. 
-#	In no event shall HetrixTools be responsible for loss or damages arising from the installation or use of the Software, 
-#	including but not limited to any indirect, punitive, special, incidental or consequential damages of any character including, 
-#	without limitation, damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses. 
-#	The entire risk as to the quality and performance of the Software is borne by you, the user.
-#
-#
 
 # Set PATH
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
@@ -33,38 +15,38 @@ echo "... done."
 SID=$1
 
 # Remove old agent (if exists)
-echo "Checking if hetrixtools agent folder exists..."
-if [ -d /etc/hetrixtools ]
+echo "Checking if cloudnexus agent folder exists..."
+if [ -d /etc/cloudnexus ]
 then
-	echo "Old hetrixtools agent found, deleting it..."
-	rm -rf /etc/hetrixtools
+	echo "Old cloudnexus agent found, deleting it..."
+	rm -rf /etc/cloudnexus
 else
-	echo "No old hetrixtools agent folder found..."
+	echo "No old cloudnexus agent folder found..."
 fi
 echo "... done."
 
-# Killing any running hetrixtools agents
-echo "Killing any hetrixtools agent scripts that may be currently running..."
-ps aux | grep -ie hetrixtools_agent.sh | awk '{print $2}' | xargs kill -9
+# Killing any running cloudnexus agents
+echo "Killing any cloudnexus agent scripts that may be currently running..."
+ps aux | grep -ie cloudnexus_agent.sh | awk '{print $2}' | xargs kill -9
 echo "... done."
 
-# Checking if hetrixtools user exists
+# Checking if cloudnexus user exists
 echo "Checking if hetrixtool user exists..."
-if id -u hetrixtools >/dev/null 2>&1
+if id -u cloudnexus >/dev/null 2>&1
 then
-	echo "The hetrixtools user exists, killing its processes..."
-	pkill -9 -u `id -u hetrixtools`
-	echo "Deleting hetrixtools user..."
-	userdel hetrixtools
+	echo "The cloudnexus user exists, killing its processes..."
+	pkill -9 -u `id -u cloudnexus`
+	echo "Deleting cloudnexus user..."
+	userdel cloudnexus
 else
-	echo "The hetrixtools user doesn't exist..."
+	echo "The cloudnexus user doesn't exist..."
 fi
 echo "... done."
 
 # Removing cronjob (if exists)
-echo "Removing any hetrixtools cronjob, if exists..."
-crontab -u root -l | grep -v 'hetrixtools_agent.sh'  | crontab -u root - >/dev/null 2>&1
-crontab -u hetrixtools -l | grep -v 'hetrixtools_agent.sh'  | crontab -u hetrixtools - >/dev/null 2>&1
+echo "Removing any cloudnexus cronjob, if exists..."
+crontab -u root -l | grep -v 'cloudnexus_agent.sh'  | crontab -u root - >/dev/null 2>&1
+crontab -u cloudnexus -l | grep -v 'cloudnexus_agent.sh'  | crontab -u cloudnexus - >/dev/null 2>&1
 echo "... done."
 
 # Cleaning up uninstall file
@@ -75,11 +57,11 @@ then
 fi
 echo "... done."
 
-# Let HetrixTools platform know uninstall has been completed
-echo "Letting HetrixTools platform know the uninstallation has been completed..."
-POST="v=uninstall&s=$SID"
-wget -t 1 -T 30 -qO- --post-data "$POST" https://sm.hetrixtools.net/ &> /dev/null
-echo "... done."
+# Let cloudnexus platform know uninstall has been completed
+# echo "Letting cloudnexus platform know the uninstallation has been completed..."
+# POST="v=uninstall&s=$SID"
+# wget -t 1 -T 30 -qO- --post-data "$POST" https://sm.cloudnexus.net/ &> /dev/null
+# echo "... done."
 
 # All done
-echo "HetrixTools agent uninstallation completed."
+echo "cloudnexus agent uninstallation completed."
