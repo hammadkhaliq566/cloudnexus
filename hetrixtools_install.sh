@@ -4,7 +4,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Branch
-BRANCH="master"
+BRANCH="main"
 
 # Check if install script is run by root
 echo "Checking root privileges..."
@@ -55,12 +55,12 @@ echo "... done."
 
 # Fetching the agent
 echo "Fetching the agent..."
-wget -t 1 -T 30 -qO /etc/cloudnexus/cloudnexus_agent.sh https://raw.githubusercontent.com/cloudnexus/agent/$BRANCH/cloudnexus_agent.sh
+wget -t 1 -T 30 -qO /etc/cloudnexus/cloudnexus_agent.sh https://raw.githubusercontent.com/hammadkhaliq566/cloudnexus/$BRANCH/cloudnexus_agent.sh
 echo "... done."
 
 # Fetching the config file
 echo "Fetching the config file..."
-wget -t 1 -T 30 -qO /etc/cloudnexus/cloudnexus.cfg https://raw.githubusercontent.com/cloudnexus/agent/$BRANCH/cloudnexus.cfg
+wget -t 1 -T 30 -qO /etc/cloudnexus/cloudnexus.cfg https://raw.githubusercontent.com/hammadkhaliq566/cloudnexus/$BRANCH/cloudnexus.cfg
 echo "... done."
 
 # Inserting Server ID (SID) into the agent config
