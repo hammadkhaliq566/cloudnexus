@@ -173,15 +173,15 @@ echo "... done."
 # echo "... done."
 
 # Start the agent
-# if [ "$2" -eq "1" ]
-# then
-# 	echo "Starting the agent under the 'root' user..."
-# 	bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
-# else
-# 	echo "Starting the agent under the 'cloudnexus' user..."
-# 	sudo -u cloudnexus bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
-# fi
-# echo "... done."
+if [ "$2" -eq "1" ]
+then
+	echo "Starting the agent under the 'root' user..."
+	bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
+else
+	echo "Starting the agent under the 'cloudnexus' user..."
+	sudo -u cloudnexus bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
+fi
+echo "... done."
 
 # All done
 echo "cloudnexus agent installation completed."
