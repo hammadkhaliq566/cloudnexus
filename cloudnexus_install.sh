@@ -148,7 +148,7 @@ echo "... done."
 
 # Setup the new cronjob to run the agent either as 'root' or as 'cloudnexus' user, depending on client's installation choice.
 # Default is running the agent as 'cloudnexus' user, unless chosen otherwise by the client when fetching the installation code from the cloudnexus website.
-if [ "$2" -eq "1" ]
+if [ "$2" -eq "root" ]
 then
 	echo "Setting up the new cronjob as 'root' user..."
 	crontab -u root -l 2>/dev/null | { cat; echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
@@ -159,12 +159,12 @@ fi
 echo "... done."
 
 # Cleaning up install file
-echo "Cleaning up the installation file..."
-if [ -f $0 ]
-then
-    rm -f $0
-fi
-echo "... done."
+# echo "Cleaning up the installation file..."
+# if [ -f $0 ]
+# then
+#     rm -f $0
+# fi
+# echo "... done."
 
 # Let cloudnexus platform know install has been completed
 # echo "Letting cloudnexus platform know the installation has been completed..."
