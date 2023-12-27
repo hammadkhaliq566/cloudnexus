@@ -154,7 +154,7 @@ do
 	tCPUsy=$(echo | awk "{print $tCPUsy + $CPUsy}")
 	
 	# CPU clock
-	CPUSpeed=$(grep 'cpu MHz' /proc/cpuinfo | awk -F": " '{print $2}' | awk '{printf "%18.0f",$1}' | xargs | sed -e 's/ /+/g')
+	CPUSpeed=$(grep 'cpu MHz' /proc/cpuinfo | awk -F": " '{print $2}' | awk '{printf "%18.0f",$1}' | sed -e 's/ /+/g')
 	if [ -z "$CPUSpeed" ]
 	then
 		CPUSpeed=0
@@ -214,10 +214,10 @@ do
 		# Received Traffic
 		RX=$(echo | awk "{print $(echo "$T" | grep -w "$NIC:" | awk '{print $2}') - ${aRX[$NIC]}}")
 		RX=$(echo | awk "{print $RX / $TIMEDIFF}")
-		RX=$(echo "$RX" | awk '{printf "%18.0f",$1}' | xargs)
+		RX=$(echo "$RX" | awk '{printf "%18.0f",$1}')
 		aRX[$NIC]=$(echo "$T" | grep -w "$NIC:" | awk '{print $2}')
 		tRX[$NIC]=$(echo | awk "{print ${tRX[$NIC]} + $RX}")
-		tRX[$NIC]=$(echo "${tRX[$NIC]}" | awk '{printf "%18.0f",$1}' | xargs)
+		tRX[$NIC]=$(echo "${tRX[$NIC]}" | awk '{printf "%18.0f",$1}')
 		# Transferred Traffic
 		TX=$(echo | awk "{print $(echo "$T" | grep -w "$NIC:" | awk '{print $10}') - ${aTX[$NIC]}}")
 		TX=$(echo | awk "{print $TX / $TIMEDIFF}")
