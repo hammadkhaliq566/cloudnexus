@@ -77,27 +77,9 @@ then
 fi
 echo "... done."
 
-# Check if software RAID should be monitored
-echo "Checking if software RAID should be monitored..."
-if [ "$4" -eq "1" ]
-then
-	echo "Enabling software RAID monitoring in the agent config..."
-	sed -i "s/CheckSoftRAID=0/CheckSoftRAID=1/" /etc/cloudnexus/cloudnexus.cfg
-fi
-echo "... done."
-
-# Check if Drive Health should be monitored
-echo "Checking if Drive Health should be monitored..."
-if [ "$5" -eq "1" ]
-then
-	echo "Enabling Drive Health monitoring in the agent config..."
-	sed -i "s/CheckDriveHealth=0/CheckDriveHealth=1/" /etc/cloudnexus/cloudnexus.cfg
-fi
-echo "... done."
-
 # Check if 'View running processes' should be enabled
 echo "Checking if 'View running processes' should be enabled..."
-if [ "$6" -eq "1" ]
+if [ "$4" -eq "1" ]
 then
 	echo "Enabling 'View running processes' in the agent config..."
 	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/cloudnexus/cloudnexus.cfg
@@ -106,10 +88,10 @@ echo "... done."
 
 # Check if any ports to monitor number of connections on
 echo "Checking if any ports to monitor number of connections on..."
-if [ "$7" != "0" ]
+if [ "$5" != "0" ]
 then
 	echo "Ports found, inserting them into the agent config..."
-	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$7\"/" /etc/cloudnexus/cloudnexus.cfg
+	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$5\"/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 

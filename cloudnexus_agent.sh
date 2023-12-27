@@ -506,86 +506,6 @@ then
 fi
 SRVCS=$(echo -ne "$SRVCS" | sed 's/ //g')
 
-# Check Software RAID
-RAID=""
-if [ "$CheckSoftRAID" -gt 0 ]
-then
-	for i in $(timeout 3 df -PB1 | awk '$1 ~ /\// {print}' | awk '{print $1}')
-	do
-		mdadm=$(mdadm -D "$i")
-		if [ -n "$mdadm" ]
-		then
-			mnt=$(timeout 3 df -PB1 | grep "$i " | awk '{print $(NF)}')
-			RAID="$RAID$mnt,$i,$mdadm;"
-		fi
-	done
-fi
-RAID=$(echo -ne "$RAID" | sed 's/ //g')
-
-# Check Drive Health
-DH=""
-if [ "$CheckDriveHealth" -gt 0 ]
-then
-	if [ -x "$(command -v smartctl)" ] #Using S.M.A.R.T. (for regular HDD/SSD)
-	then
-		for i in $(lsblk -l | grep 'disk' | awk '{print $1}')
-		do
-			DHealth=$(smartctl -A /dev/"$i")
-			if grep -q 'Attribute' <<< "$DHealth"
-			then
-				DHealth=$(smartctl -H /dev/"$i")"\n$DHealth"
-				DHealth=$(echo -ne "$DHealth" | sed 's/ //g')
-				DInfo="$(smartctl -i /dev/"$i")"
-				DModel="$(echo "$DInfo" | grep -i "Device Model:" | awk -F ':' '{print $2}')"
-				DSerial="$(echo "$DInfo" | grep -i "Serial Number:" | awk -F ':' '{print $2}')"
-				DH="$DH""1,$i,$DHealth,$DModel,$DSerial;"
-			else # If initial read has failed, see if drives are behind hardware raid
-				MegaRaid=()
-				while IFS='' read -r line; do MegaRaid+=("$line"); done < <(smartctl --scan | grep megaraid | awk '{print $(3)}')
-				if [ ${#MegaRaid[@]} -gt 0 ]
-				then
-					MegaRaidN=0
-					for MegaRaidID in "${MegaRaid[@]}"
-					do
-						DHealth=$(smartctl -A -d "$MegaRaidID" /dev/"$i")
-						if grep -q 'Attribute' <<< "$DHealth"
-						then
-							MegaRaidN=$((MegaRaidN + 1))
-							DHealth=$(smartctl -H -d "$MegaRaidID" /dev/"$i")"\n$DHealth"
-							DHealth=$(echo -ne "$DHealth" | sed 's/ //g')
-							DInfo="$(smartctl -i -d "$MegaRaidID" /dev/"$i")"
-							DModel="$(echo "$DInfo" | grep -i "Device Model:" | awk -F ':' '{print $2}')"
-							DSerial="$(echo "$DInfo" | grep -i "Serial Number:" | awk -F ':' '{print $2}')"
-							DH="$DH""1,${i}[$MegaRaidN],$DHealth,$DModel,$DSerial;"
-						fi
-					done
-					break
-				fi
-			fi
-		done
-	fi
-	if [ -x "$(command -v nvme)" ] #Using nvme-cli (for NVMe)
-	then
-		NVMeList="$(nvme list)"
-		for i in $(lsblk -l | grep 'disk' | awk '{print $1}')
-		do
-			DHealth=$(nvme smart-log /dev/"$i")
-			if grep -q 'NVME' <<< "$DHealth"
-			then
-				if [ -x "$(command -v smartctl)" ]
-				then
-					DHealth=$(smartctl -H /dev/"${i%??}")"\n$DHealth"
-				fi
-				DHealth=$(echo -ne "$DHealth" | sed 's/ //g')
-				DModel="$(echo "$NVMeList" | grep /dev/"$i" | sed -E 's/[ ]{2,}/|/g' | awk -F '|' '{print $3}')"
-				DSerial="$(echo "$NVMeList" | grep /dev/"$i" | awk '{print $2}')"
-				DH="$DH""2,$i,$DHealth,$DModel,$DSerial;"
-			fi
-		done
-	fi
-fi
-DH=$(echo -ne "$DH" | sed 's/ //g')
-
 # Custom Variables
 CV=""
 if [ -n "$CustomVars" ]
@@ -624,7 +544,7 @@ fi
 Time=$(date +%Y-%m-%d\ %T\ %Z)
 
 # Prepare data
-json='{"SID":"'"$SID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","time":"'"$Time"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","raid":"'"$RAID"'","dh":"'"$DH"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'","rps1":"'"$RPS1"'","rps2":"'"$RPS2"'"}'
+json='{"SID":"'"$SID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","time":"'"$Time"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'","rps1":"'"$RPS1"'","rps2":"'"$RPS2"'"}'
 
 # Save data to file
 echo "$json" > "$ScriptPath"/cloudnexus_agent.log
