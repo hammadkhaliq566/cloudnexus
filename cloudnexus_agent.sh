@@ -345,27 +345,27 @@ then
 else
 	OS="$(uname -s)"
 fi
-OS=$(echo -ne "$OS" | base64 | xargs | sed 's/ //g')
+OS=$(echo -ne "$OS" | sed 's/ //g')
 
 # Kernel
-Kernel=$(uname -r | base64 | xargs | sed 's/ //g')
+Kernel=$(uname -r  | sed 's/ //g')
 
 # Hostname
-Hostname=$(uname -n | base64 | xargs | sed 's/ //g')
+Hostname=$(uname -n  | sed 's/ //g')
 
 # Server uptime
-Uptime=$(awk '{print $1}' < /proc/uptime | awk '{printf "%18.0f",$1}' | xargs)
+Uptime=$(awk '{print $1}' < /proc/uptime | awk '{printf "%18.0f",$1}' )
 
 # lscpu
 lscpu=$(lscpu)
 
 # CPU model
-CPUModel=$(grep -m1 'model name' /proc/cpuinfo | awk -F": " '{print $NF}' | xargs)
+CPUModel=$(grep -m1 'model name' /proc/cpuinfo | awk -F": " '{print $NF}')
 if [ -z "$CPUModel" ]
 then
-	CPUModel=$(echo "$lscpu" | grep "^Model name:" | awk -F": " '{print $NF}' | xargs)
+	CPUModel=$(echo "$lscpu" | grep "^Model name:" | awk -F": " '{print $NF}')
 fi
-CPUModel=$(echo -ne "$CPUModel" | base64 | xargs | sed 's/ //g')
+CPUModel=$(echo -ne "$CPUModel" | sed 's/ //g')
 
 # CPU sockets
 CPUSockets=$(grep -i "physical id" /proc/cpuinfo | sort -u | wc -l)
@@ -379,9 +379,9 @@ CPUThreads=$(echo "$lscpu" | grep "^Thread(s) per core:" | awk '{print $(NF)}')
 # CPU clock speed
 if [ -z "$tCPUSpeed" ] || [ "$tCPUSpeed" -eq 0 ]
 then
-	CPUSpeed=$(echo "$lscpu" | grep "^CPU max MHz" | awk '{print $NF}' | awk '{printf "%18.0f",$1}' | xargs)
+	CPUSpeed=$(echo "$lscpu" | grep "^CPU max MHz" | awk '{print $NF}' | awk '{printf "%18.0f",$1}')
 else
-	CPUSpeed=$(echo | awk "{print $tCPUSpeed / $CPUCores / $X}" | awk '{printf "%18.0f",$1}' | xargs)
+	CPUSpeed=$(echo | awk "{print $tCPUSpeed / $CPUCores / $X}" | awk '{printf "%18.0f",$1}' )
 fi
 
 # Average CPU usage
@@ -428,10 +428,10 @@ RAMBuff=$(echo | awk "{print $tRAMBuff / $X}")
 RAMCache=$(echo | awk "{print $tRAMCache / $X}")
 
 # Disks usage
-DISKs=$(echo -ne "$(timeout 3 df -TPB1 | sed 1d | grep -v -E 'tmpfs' | awk '{print $(NF)","$2","$3","$4","$5";"}')" | xargs | sed 's/ //g' | base64 | xargs | sed 's/ //g')
+DISKs=$(echo -ne "$(timeout 3 df -TPB1 | sed 1d | grep -v -E 'tmpfs' | awk '{print $(NF)","$2","$3","$4","$5";"}')" | sed 's/ //g'  | sed 's/ //g')
 
 # Disks inodes
-INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | grep -v -E 'tmpfs' | awk '{print $(NF)","$3","$4","$5";"}')" | xargs | sed 's/ //g' | base64 | xargs | sed 's/ //g')
+INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | grep -v -E 'tmpfs' | awk '{print $(NF)","$3","$4","$5";"}')" | sed 's/ //g' | sed 's/ //g')
 
 # Disks IOPS
 IOPS=""
@@ -439,12 +439,12 @@ diskstats=$(cat /proc/diskstats)
 for i in "${!vDISKs[@]}"
 do
 	IOPSRead[$i]=$(echo | awk "{print $(echo | awk "{print $(echo "$diskstats" | grep -w "${vDISKs[$i]}" | awk '{print $6}') - ${IOPSRead[$i]}}" 2> /dev/null) * 512 / $tTIMEDIFF}" 2> /dev/null)
-	IOPSRead[$i]=$(echo "${IOPSRead[$i]}" | awk '{printf "%18.0f",$1}' | xargs)
+	IOPSRead[$i]=$(echo "${IOPSRead[$i]}" | awk '{printf "%18.0f",$1}')
 	IOPSWrite[$i]=$(echo | awk "{print $(echo | awk "{print $(echo "$diskstats" | grep -w "${vDISKs[$i]}" | awk '{print $10}') - ${IOPSWrite[$i]}}" 2> /dev/null) * 512 / $tTIMEDIFF}" 2> /dev/null)
-	IOPSWrite[$i]=$(echo "${IOPSWrite[$i]}" | awk '{printf "%18.0f",$1}' | xargs)
+	IOPSWrite[$i]=$(echo "${IOPSWrite[$i]}" | awk '{printf "%18.0f",$1}')
 	IOPS="$IOPS$i,${IOPSRead[$i]},${IOPSWrite[$i]};"
 done
-IOPS=$(echo -ne "$IOPS" | base64 | xargs | sed 's/ //g')
+IOPS=$(echo -ne "$IOPS" | sed 's/ //g')
 
 # Total network usage and IP addresses
 RX=0
@@ -461,12 +461,12 @@ do
 	TX=$(echo "$TX" | awk '{printf "%18.0f",$1}' | xargs)
 	NICS="$NICS$NIC,$RX,$TX;"
 	# Individual NIC IP addresses
-	IPv4="$IPv4$NIC,$(ip -4 addr show "$NIC" | grep -oP 'inet \K[\d.]+' | xargs | sed 's/ /,/g');"
-	IPv6="$IPv6$NIC,$(ip -6 addr show "$NIC" | grep -w "global" | grep -oP 'inet6 \K[0-9a-fA-F:]+' | xargs | sed 's/ /,/g');"
+	IPv4="$IPv4$NIC,$(ip -4 addr show "$NIC" | grep -oP 'inet \K[\d.]+' | sed 's/ /,/g');"
+	IPv6="$IPv6$NIC,$(ip -6 addr show "$NIC" | grep -w "global" | grep -oP 'inet6 \K[0-9a-fA-F:]+' | sed 's/ /,/g');"
 done
-NICS=$(echo -ne "$NICS" | base64 | xargs | sed 's/ //g')
-IPv4=$(echo -ne "$IPv4" | base64 | xargs | sed 's/ //g')
-IPv6=$(echo -ne "$IPv6" | base64 | xargs | sed 's/ //g')
+NICS=$(echo -ne "$NICS" | sed 's/ //g')
+IPv4=$(echo -ne "$IPv4" | sed 's/ //g')
+IPv6=$(echo -ne "$IPv6" | sed 's/ //g')
 
 # Port connections
 CONN=""
@@ -475,11 +475,11 @@ then
 	for cPort in "${ConnectionPortsArray[@]}"
 	do
 		CON=$(echo | awk "{print ${Connections[$cPort]} / $X}")
-		CON=$(echo "$CON" | awk '{printf "%18.0f",$1}' | xargs)
+		CON=$(echo "$CON" | awk '{printf "%18.0f",$1}')
 		CONN="$CONN$cPort,$CON;"
 	done
 fi
-CONN=$(echo -ne "$CONN" | base64 | xargs | sed 's/ //g')
+CONN=$(echo -ne "$CONN" | sed 's/ //g')
 
 # Temperature
 TEMP=""
@@ -488,11 +488,11 @@ then
 	for TempName in "${!TempArray[@]}"
 	do
 		TMP=$(echo | awk "{print ${TempArray[$TempName]} / ${TempArrayCnt[$TempName]}}")
-		TMP=$(echo "$TMP" | awk '{printf "%18.0f",$1}' | xargs)
+		TMP=$(echo "$TMP" | awk '{printf "%18.0f",$1}')
 		TEMP="$TEMP$TempName,$TMP;"
 	done
 fi
-TEMP=$(echo -ne "$TEMP" | base64 | xargs | sed 's/ //g')
+TEMP=$(echo -ne "$TEMP" | sed 's/ //g')
 
 # Check Services (if any are set to be checked)
 SRVCS=""
@@ -504,7 +504,7 @@ then
 		SRVCS="$SRVCS$(servicestatus "$i");"
 	done
 fi
-SRVCS=$(echo -ne "$SRVCS" | base64 | xargs | sed 's/ //g')
+SRVCS=$(echo -ne "$SRVCS" | sed 's/ //g')
 
 # Check Software RAID
 RAID=""
@@ -520,7 +520,7 @@ then
 		fi
 	done
 fi
-RAID=$(echo -ne "$RAID" | base64 | xargs | sed 's/ //g')
+RAID=$(echo -ne "$RAID" | sed 's/ //g')
 
 # Check Drive Health
 DH=""
@@ -534,10 +534,10 @@ then
 			if grep -q 'Attribute' <<< "$DHealth"
 			then
 				DHealth=$(smartctl -H /dev/"$i")"\n$DHealth"
-				DHealth=$(echo -ne "$DHealth" | base64 | xargs | sed 's/ //g')
+				DHealth=$(echo -ne "$DHealth" | sed 's/ //g')
 				DInfo="$(smartctl -i /dev/"$i")"
-				DModel="$(echo "$DInfo" | grep -i "Device Model:" | awk -F ':' '{print $2}' | xargs)"
-				DSerial="$(echo "$DInfo" | grep -i "Serial Number:" | awk -F ':' '{print $2}' | xargs)"
+				DModel="$(echo "$DInfo" | grep -i "Device Model:" | awk -F ':' '{print $2}')"
+				DSerial="$(echo "$DInfo" | grep -i "Serial Number:" | awk -F ':' '{print $2}')"
 				DH="$DH""1,$i,$DHealth,$DModel,$DSerial;"
 			else # If initial read has failed, see if drives are behind hardware raid
 				MegaRaid=()
@@ -552,10 +552,10 @@ then
 						then
 							MegaRaidN=$((MegaRaidN + 1))
 							DHealth=$(smartctl -H -d "$MegaRaidID" /dev/"$i")"\n$DHealth"
-							DHealth=$(echo -ne "$DHealth" | base64 | xargs | sed 's/ //g')
+							DHealth=$(echo -ne "$DHealth" | sed 's/ //g')
 							DInfo="$(smartctl -i -d "$MegaRaidID" /dev/"$i")"
-							DModel="$(echo "$DInfo" | grep -i "Device Model:" | awk -F ':' '{print $2}' | xargs)"
-							DSerial="$(echo "$DInfo" | grep -i "Serial Number:" | awk -F ':' '{print $2}' | xargs)"
+							DModel="$(echo "$DInfo" | grep -i "Device Model:" | awk -F ':' '{print $2}')"
+							DSerial="$(echo "$DInfo" | grep -i "Serial Number:" | awk -F ':' '{print $2}')"
 							DH="$DH""1,${i}[$MegaRaidN],$DHealth,$DModel,$DSerial;"
 						fi
 					done
@@ -576,7 +576,7 @@ then
 				then
 					DHealth=$(smartctl -H /dev/"${i%??}")"\n$DHealth"
 				fi
-				DHealth=$(echo -ne "$DHealth" | base64 | xargs | sed 's/ //g')
+				DHealth=$(echo -ne "$DHealth" | sed 's/ //g')
 				DModel="$(echo "$NVMeList" | grep /dev/"$i" | sed -E 's/[ ]{2,}/|/g' | awk -F '|' '{print $3}')"
 				DSerial="$(echo "$NVMeList" | grep /dev/"$i" | awk '{print $2}')"
 				DH="$DH""2,$i,$DHealth,$DModel,$DSerial;"
@@ -584,7 +584,7 @@ then
 		done
 	fi
 fi
-DH=$(echo -ne "$DH" | base64 | xargs | sed 's/ //g')
+DH=$(echo -ne "$DH" | sed 's/ //g')
 
 # Custom Variables
 CV=""
@@ -592,7 +592,7 @@ if [ -n "$CustomVars" ]
 then
 	if [ -s "$ScriptPath"/"$CustomVars" ]
 	then
-		CV=$(< "$ScriptPath"/"$CustomVars" base64 | xargs | sed 's/ //g')
+		CV=$(< "$ScriptPath"/"$CustomVars" | sed 's/ //g')
 	fi
 fi
 
@@ -608,7 +608,7 @@ then
 	fi
 	# Get the current 'running processes' snapshot
 	RPS2=$(ps -Ao pid,ppid,uid,user:20,pcpu,pmem,cputime,etime,comm,cmd --no-headers)
-	RPS2=$(echo -ne "$RPS2" | base64 -w 0 | sed 's/ //g')
+	RPS2=$(echo -ne "$RPS2"  | sed 's/ //g')
 	# Save the current snapshot for next run
 	echo "$RPS2" > "$ScriptPath"/running_proc.txt
 fi
