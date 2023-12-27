@@ -79,7 +79,7 @@ echo "... done."
 
 # Check if 'View running processes' should be enabled
 echo "Checking if 'View running processes' should be enabled..."
-if [ "$4" -eq "1" ]
+if [ "$4" == "1" ]
 then
 	echo "Enabling 'View running processes' in the agent config..."
 	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/cloudnexus/cloudnexus.cfg
@@ -130,7 +130,7 @@ echo "... done."
 
 # Setup the new cronjob to run the agent either as 'root' or as 'cloudnexus' user, depending on client's installation choice.
 # Default is running the agent as 'cloudnexus' user, unless chosen otherwise by the client when fetching the installation code from the cloudnexus website.
-if [ "$2" -eq "root" ]
+if [ "$2" == "root" ]
 then
 	echo "Setting up the new cronjob as 'root' user..."
 	crontab -u root -l 2>/dev/null | { cat; echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
@@ -155,7 +155,7 @@ echo "... done."
 # echo "... done."
 
 # Start the agent
-if [ "$2" -eq "1" ]
+if [ "$2" == "root" ]
 then
 	echo "Starting the agent under the 'root' user..."
 	bash /etc/cloudnexus/cloudnexus_agent.sh > /dev/null 2>&1 &
