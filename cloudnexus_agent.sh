@@ -551,3 +551,5 @@ echo "$json" > "$ScriptPath"/cloudnexus_agent.log
 
 # Post data
 # wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --post-file="$ScriptPath/cloudnexus_agent.log" "$SecuredConnection" https://sm.cloudnexus.net/v2/ &> /dev/null
+
+# Manufacture, Model, TimeZone, Location, CPU Utilization, CPU Metrics, Average Disk Utilization, Packet Sent, Packet Recieved, Data Sent, Data Recived.
