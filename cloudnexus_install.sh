@@ -133,10 +133,10 @@ echo "... done."
 if [ "$2" == "root" ]
 then
 	echo "Setting up the new cronjob as 'root' user..."
-	crontab -u root -l 2>/dev/null | { cat; echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
+	crontab -u root -l 2>/dev/null | { echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root -l - >/dev/null 2>&1
 else
 	echo "Setting up the new cronjob as 'cloudnexus' user..."
-	crontab -u cloudnexus -l 2>/dev/null | { cat; echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u cloudnexus - >/dev/null 2>&1
+	crontab -u cloudnexus -l 2>/dev/null | { echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u cloudnexus - >/dev/null 2>&1
 fi
 echo "... done."
 
@@ -151,7 +151,7 @@ echo "... done."
 # Let cloudnexus platform know install has been completed
 # echo "Letting cloudnexus platform know the installation has been completed..."
 # POST="v=install&s=$SID"
-# wget -t 1 -T 30 -qO- --post-data "$POST" https://sm.cloudnexus.net/ &> /dev/null
+# wget -t 1 -T 30 -qO- --post-data "$POST"  &> /dev/null
 # echo "... done."
 
 # Start the agent
