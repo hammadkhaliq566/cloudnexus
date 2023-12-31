@@ -130,13 +130,12 @@ echo "... done."
 
 # Setup the new cronjob to run the agent either as 'root' or as 'cloudnexus' user, depending on client's installation choice.
 # Default is running the agent as 'cloudnexus' user, unless chosen otherwise by the client when fetching the installation code from the cloudnexus website.
-if [ "$2" == "root" ]
-then
-	echo "Setting up the new cronjob as 'root' user..."
-	crontab -u root -l 2>/dev/null | { echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root -l - >/dev/null 2>&1
+if [ "$2" == "root" ]; then
+    echo "Setting up the new cronjob as 'root' user..."
+    crontab -l -u root 2>/dev/null | { cat; echo "* * * * * /bin/bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
 else
-	echo "Setting up the new cronjob as 'cloudnexus' user..."
-	crontab -u cloudnexus -l 2>/dev/null | { echo "* * * * * bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u cloudnexus - >/dev/null 2>&1
+    echo "Setting up the new cronjob as 'cloudnexus' user..."
+    crontab -l -u cloudnexus 2>/dev/null | { cat; echo "* * * * * /bin/bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u cloudnexus - >/dev/null 2>&1
 fi
 echo "... done."
 
