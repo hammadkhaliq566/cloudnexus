@@ -133,9 +133,15 @@ echo "... done."
 if [ "$2" == "root" ]; then
     echo "Setting up the new cronjob as 'root' user..."
     crontab -l -u root 2>/dev/null | { cat; echo "* * * * * /bin/bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u root - >/dev/null 2>&1
+	sudo systemctl start crond	
+	sudo systemctl enable crond
+	sudo chmod +x /etc/cloudnexus/cloudnexus_agent.sh
 else
     echo "Setting up the new cronjob as 'cloudnexus' user..."
     crontab -l -u cloudnexus 2>/dev/null | { cat; echo "* * * * * /bin/bash /etc/cloudnexus/cloudnexus_agent.sh >> /etc/cloudnexus/cloudnexus_cron.log 2>&1"; } | crontab -u cloudnexus - >/dev/null 2>&1
+	sudo systemctl start crond	
+	sudo systemctl enable crond
+	sudo chmod +x /etc/cloudnexus/cloudnexus_agent.sh
 fi
 echo "... done."
 
