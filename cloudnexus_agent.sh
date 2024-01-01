@@ -534,6 +534,9 @@ json='{"SID":"'"$SID"'","UID":"'"$UID"'","agent":"0","user":"'"$User"'","os":"'"
 
 Filename="cloudnexus_agent_$Time.log"
 
+# Save data to file
+echo "$json" > "$ScriptPath"/"$Filename"
+
 # Post data
 # wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://e94e-2400-adc5-45a-ee00-7d2b-5d0f-5e32-6af7.ngrok-free.app/api/user/addServer/ &> /dev/null
 

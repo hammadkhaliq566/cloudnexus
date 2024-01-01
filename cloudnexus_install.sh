@@ -94,13 +94,13 @@ fi
 echo "... done."
 
 # Check if 'View running processes' should be enabled
-echo "Checking if 'View running processes' should be enabled..."
-if [ "$5" == "1" ]
-then
-	echo "Enabling 'View running processes' in the agent config..."
-	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/cloudnexus/cloudnexus.cfg
-fi
-echo "... done."
+# echo "Checking if 'View running processes' should be enabled..."
+# if [ "$5" == "1" ]
+# then
+# 	echo "Enabling 'View running processes' in the agent config..."
+# 	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/cloudnexus/cloudnexus.cfg
+# fi
+# echo "... done."
 
 # Check if any ports to monitor number of connections on
 echo "Checking if any ports to monitor number of connections on..."
