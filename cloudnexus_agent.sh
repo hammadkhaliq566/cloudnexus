@@ -353,6 +353,12 @@ Kernel=$(uname -r  | sed 's/ //g')
 # Hostname
 Hostname=$(uname -n  | sed 's/ //g')
 
+# Location
+Location=$(curl ipinfo.io | grep country | awk -F'"' '{print $4}')
+
+# Vendor
+sysVendor=$(cat /sys/class/dmi/id/sys_vendor)
+
 # Server uptime
 Uptime=$(awk '{print $1}' < /proc/uptime | awk '{printf "%18.0f",$1}' )
 
@@ -517,18 +523,19 @@ then
 fi
 
 # Current time/date
-Time=$(date +%Y-%m-%d_%H:%M:%S)
+currentDateTime=$(date "+%Y-%m-%d_%H:%M:%S")
+
+# Extract date and time into separate variables
+Date=$(echo $currentDateTime | awk -F_ '{print $1}')
+Time=$(echo $currentDateTime | awk -F_ '{print $2}')
 
 # Prepare data
-json='{"SID":"'"$SID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","time":"'"$Time"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'"}'
+json='{"SID":"'"$SID"'","UID":"'"$UID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","date":"'"$Date"'","time":"'"$Time"'","location":"'"$Location"'","Vendor":"'"$sysVendor"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'"}'
 
 Filename="cloudnexus_agent_$Time.log"
 
-# Save data to file
-echo "$json" > "$ScriptPath"/"$Filename"
-
 # Post data
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://e94e-2400-adc5-45a-ee00-7d2b-5d0f-5e32-6af7.ngrok-free.app/api/user/addServer/ &> /dev/null
+# wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://e94e-2400-adc5-45a-ee00-7d2b-5d0f-5e32-6af7.ngrok-free.app/api/user/addServer/ &> /dev/null
 
 if [ $? -eq 0 ]; then
     echo "Data posted successfully!"
@@ -536,4 +543,5 @@ else
     echo "Error posting data. Exit status: $?"
 fi
 
-# Manufacture, Model, TimeZone, Location, CPU Utilization, CPU Metrics, Average Disk Utilization, Packet Sent, Packet Recieved, Data Sent, Data Recived.
+# Done
+# UID, location,  Date, Time, Vendor

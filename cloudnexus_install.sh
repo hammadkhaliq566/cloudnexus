@@ -25,9 +25,19 @@ if [ -z "$SID" ]
 fi
 echo "... done."
 
-# Check if user has selected to run agent as 'root' or as 'cloudnexus' user
-if [ -z "$2" ]
+UID=$2
+
+# Make sure UID is not empty
+echo "Checking User ID (UID)..."
+if [ -z "$UID" ]
 	then echo "ERROR: Second parameter missing."
+	exit
+fi
+echo "... done."
+
+# Check if user has selected to run agent as 'root' or as 'cloudnexus' user
+if [ -z "$3" ]
+	then echo "ERROR: third parameter missing."
 	exit
 fi
 
@@ -70,7 +80,7 @@ echo "... done."
 
 # Check if any services are to be monitored
 echo "Checking if any services should be monitored..."
-if [ "$3" != "0" ]
+if [ "$4" != "0" ]
 then
 	echo "Services found, inserting them into the agent config..."
 	sed -i "s/CheckServices=\"\"/CheckServices=\"$3\"/" /etc/cloudnexus/cloudnexus.cfg
@@ -79,7 +89,7 @@ echo "... done."
 
 # Check if 'View running processes' should be enabled
 echo "Checking if 'View running processes' should be enabled..."
-if [ "$4" == "1" ]
+if [ "$5" == "1" ]
 then
 	echo "Enabling 'View running processes' in the agent config..."
 	sed -i "s/RunningProcesses=0/RunningProcesses=1/" /etc/cloudnexus/cloudnexus.cfg
@@ -88,12 +98,13 @@ echo "... done."
 
 # Check if any ports to monitor number of connections on
 echo "Checking if any ports to monitor number of connections on..."
-if [ "$5" != "0" ]
+if [ "$6" != "0" ]
 then
 	echo "Ports found, inserting them into the agent config..."
 	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$5\"/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
+
 
 # Killing any running cloudnexus agents
 echo "Making sure no cloudnexus agent scripts are currently running..."
