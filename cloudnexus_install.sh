@@ -25,6 +25,7 @@ if [ -z "$SID" ]
 fi
 echo "... done."
 
+# Fetch User Unique ID
 UID=$2
 
 # Make sure UID is not empty
@@ -78,6 +79,11 @@ echo "Inserting Server ID (SID) into agent config..."
 sed -i "s/SID=\"\"/SID=\"$SID\"/" /etc/cloudnexus/cloudnexus.cfg
 echo "... done."
 
+# Inserting User ID (UID) into the agent config
+echo "Inserting User ID (UID) into agent config..."
+sed -i "s/UID=\"\"/UID=\"$UID\"/" /etc/cloudnexus/cloudnexus.cfg
+echo "... done."
+
 # Check if any services are to be monitored
 echo "Checking if any services should be monitored..."
 if [ "$4" != "0" ]
@@ -104,7 +110,6 @@ then
 	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$5\"/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
-
 
 # Killing any running cloudnexus agents
 echo "Making sure no cloudnexus agent scripts are currently running..."
