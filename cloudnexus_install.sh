@@ -26,11 +26,11 @@ fi
 echo "... done."
 
 # Fetch User Unique ID
-UID=$2
+User_ID=$2
 
 # Make sure UID is not empty
 echo "Checking User ID (UID)..."
-if [ -z "$UID" ]
+if [ -z "$User_ID" ]
 	then echo "ERROR: Second parameter missing."
 	exit
 fi
@@ -81,7 +81,7 @@ echo "... done."
 
 # Inserting User ID (UID) into the agent config
 echo "Inserting User ID (UID) into agent config..."
-sed -i "s/UID=\"\"/UID=\"$UID\"/" /etc/cloudnexus/cloudnexus.cfg
+sed -i "s/UID=\"\"/UID=\"$User_ID\"/" /etc/cloudnexus/cloudnexus.cfg
 echo "... done."
 
 # Check if any services are to be monitored
