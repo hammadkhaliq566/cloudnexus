@@ -89,7 +89,7 @@ echo "Checking if any services should be monitored..."
 if [ "$4" != "0" ]
 then
 	echo "Services found, inserting them into the agent config..."
-	sed -i "s/CheckServices=\"\"/CheckServices=\"$3\"/" /etc/cloudnexus/cloudnexus.cfg
+	sed -i "s/CheckServices=\"\"/CheckServices=\"$4\"/" /etc/cloudnexus/cloudnexus.cfg
 fi
 echo "... done."
 
