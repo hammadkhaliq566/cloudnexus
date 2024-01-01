@@ -76,7 +76,7 @@ echo "... done."
 
 # Inserting Server ID (SID) into the agent config
 echo "Inserting Server ID (SID) into agent config..."
-sed -i "s/SID=\"\"/SID=\"$SID\"/" /etc/cloudnexus/cloudnexus.cfg
+sed -i "s/User_ID=\"\"/User_ID=\"$SID\"/" /etc/cloudnexus/cloudnexus.cfg
 echo "... done."
 
 # Inserting User ID (UID) into the agent config
