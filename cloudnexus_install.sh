@@ -184,7 +184,7 @@ else
 fi
 
 # Create JSON response
-json_response='{"status":"'"$status_code"'","UID":"'"$User_ID"'"}'
+json_response='{"status":"'"$status_code"'","SID":"'"$SID"'"}'
 
 # Print JSON response
 echo "$json_response"
