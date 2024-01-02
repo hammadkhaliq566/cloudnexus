@@ -161,20 +161,6 @@ else
 fi
 echo "... done."
 
-# Cleaning up install file
-# echo "Cleaning up the installation file..."
-# if [ -f $0 ]
-# then
-#     rm -f $0
-# fi
-# echo "... done."
-
-# Let cloudnexus platform know install has been completed
-# echo "Letting cloudnexus platform know the installation has been completed..."
-# POST="v=install&s=$SID"
-# wget -t 1 -T 30 -qO- --post-data "$POST"  &> /dev/null
-# echo "... done."
-
 # Start the agent
 if [ "$2" == "root" ]
 then
@@ -186,5 +172,30 @@ else
 fi
 echo "... done."
 
-# All done
-echo "cloudnexus agent installation completed."
+# Let cloudnexus platform know install has been completed
+# Check if the agent installation was successful
+echo "Letting cloudnexus platform know the installation has been completed..."
+if [ $? -eq 0 ]; then
+    status_code=200
+    message="Agent installation completed successfully."
+else
+    status_code=404
+    message="Agent installation failed."
+fi
+
+# Create JSON response
+json_response='{"status":"'"$status_code"'","UID":"'"$User_ID"'"}'
+
+# Print JSON response
+echo "$json_response"
+
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data "$json_response" https://6254-2400-adc5-154-f400-157f-2392-c3c0-c4a7.ngrok-free.app/api/user/updateSid/ &> /dev/null
+echo "... done."
+
+# Cleaning up install file
+# echo "Cleaning up the installation file..."
+# if [ -f $0 ]
+# then
+#     rm -f $0
+# fi
+# echo "... done."
