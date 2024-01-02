@@ -104,7 +104,7 @@ echo "... done."
 
 # Check if any ports to monitor number of connections on
 echo "Checking if any ports to monitor number of connections on..."
-if [ "$6" != "0" ]
+if [ "$5" != "0" ]
 then
 	echo "Ports found, inserting them into the agent config..."
 	sed -i "s/ConnectionPorts=\"\"/ConnectionPorts=\"$5\"/" /etc/cloudnexus/cloudnexus.cfg
