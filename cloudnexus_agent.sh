@@ -360,7 +360,7 @@ Location=$(curl ipinfo.io | grep country | awk -F'"' '{print $4}')
 sysVendor=$(cat /sys/class/dmi/id/sys_vendor)
 
 # Server uptime
-Uptime=$(awk '{print $1}' < /proc/uptime | awk '{printf "%18.0f",$1}' )
+Uptime=$(awk '{print $1}' < /proc/uptime | awk '{printf "%18.0f",$1}')
 
 # lscpu
 lscpu=$(lscpu)
