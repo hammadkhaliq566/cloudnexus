@@ -411,7 +411,7 @@ loadavg5=$(echo | awk "{print $tloadavg5 / $X}")
 loadavg15=$(echo | awk "{print $tloadavg15 / $X}")
 
 # RAM size
-RAMSize=$(grep ^MemTotal: /proc/meminfo | awk '{print $2}')
+RAMSize=$(free -h | awk '/^Mem:/ {print $2}')
 
 # RAM Usage
 RAM=$(echo | awk "{print $tRAM / $X}")
@@ -538,7 +538,7 @@ Filename="cloudnexus_agent_$Date_$Time.log"
 echo "$json" > "$ScriptPath"/"$Filename"
 
 # Post data
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://6210-2400-adc5-154-f400-c09-f75f-f3ce-6ac0.ngrok-free.app/api/user/addServer/ &> /dev/null
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://71e9-2400-adc5-154-f400-c827-6e25-5508-d7cb.ngrok-free.app/api/user/addServer/ &> /dev/null
 
 if [ $? -eq 0 ]; then
     echo "Data posted successfully!"

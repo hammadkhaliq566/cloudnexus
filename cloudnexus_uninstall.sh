@@ -14,6 +14,9 @@ echo "... done."
 # Fetch Server Unique ID
 SID=$1
 
+# Fetch User Unique ID
+User_Id=$2
+
 # Remove old agent (if exists)
 echo "Checking if cloudnexus agent folder exists..."
 if [ -d /etc/cloudnexus ]
@@ -57,10 +60,22 @@ then
 fi
 echo "... done."
 
+
+echo "Letting cloudnexus platform know the Uninstallation has been completed..."
+if [ $? -eq 0 ]; then
+    status_code=200
+    message="Agent Uninstallation completed successfully."
+else
+    status_code=404
+    message="Agent Uninstallation failed."
+fi
+
+json_response='{"status":"'"$status_code"'","SID":"'"$SID"'","UID":"'"$User_Id"'"}'
+
 # Let cloudnexus platform know uninstall has been completed
 # echo "Letting cloudnexus platform know the uninstallation has been completed..."
-# POST="v=uninstall&s=$SID"
-# wget -t 1 -T 30 -qO- --post-data "$POST" https://sm.cloudnexus.net/ &> /dev/null
+
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json_response" https://71e9-2400-adc5-154-f400-c827-6e25-5508-d7cb.ngrok-free.app/api/user/uninstallServer/ &> /dev/null
 # echo "... done."
 
 # All done
