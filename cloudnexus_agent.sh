@@ -405,6 +405,9 @@ CPUus=$(echo | awk "{print $tCPUus / $X}")
 # Average CPU system time
 CPUsy=$(echo | awk "{print $tCPUsy / $X}")
 
+# Total Storage Usage in Percentage
+total_storage=$(df -TP | awk 'NR>1 {print $3,$5}' | awk '{total+=$1; used+=$2} END {printf "%.2f\n", used/total*100}')
+
 # CPU Load
 loadavg1=$(echo | awk "{print $tloadavg1 / $X}")
 loadavg5=$(echo | awk "{print $tloadavg5 / $X}")
@@ -418,6 +421,9 @@ RAM=$(echo | awk "{print $tRAM / $X}")
 
 # RAM swap size
 RAMSwapSize=$(grep "^SwapTotal:" /proc/meminfo | awk '{print $2}')
+
+# Total Users
+total_users=$(cut -d: -f1 /etc/passwd | wc -l)
 
 # RAM swap usage
 if [ "$RAMSwapSize" -gt 0 ]
@@ -458,21 +464,27 @@ TX=0
 NICS=""
 IPv4=""
 IPv6=""
+MAC=""
 for NIC in "${NetworkInterfacesArray[@]}"
 do
-	# Individual NIC network usage
-	RX=$(echo | awk "{print ${tRX[$NIC]} / $X}")
-	RX=$(echo "$RX" | awk '{printf "%18.0f",$1}' | xargs)
-	TX=$(echo | awk "{print ${tTX[$NIC]} / $X}")
-	TX=$(echo "$TX" | awk '{printf "%18.0f",$1}' | xargs)
-	NICS="$NICS$NIC,$RX,$TX;"
-	# Individual NIC IP addresses
-	IPv4="$IPv4$NIC,$(ip -4 addr show "$NIC" | grep -oP 'inet \K[\d.]+' | sed 's/ /,/g');"
-	IPv6="$IPv6$NIC,$(ip -6 addr show "$NIC" | grep -w "global" | grep -oP 'inet6 \K[0-9a-fA-F:]+' | sed 's/ /,/g');"
+    # Individual NIC network usage
+    RX=$(echo | awk "{print ${tRX[$NIC]} / $X}")
+    RX=$(echo "$RX" | awk '{printf "%18.0f",$1}' | xargs)
+    TX=$(echo | awk "{print ${tTX[$NIC]} / $X}")
+    TX=$(echo "$TX" | awk '{printf "%18.0f",$1}' | xargs)
+    NICS="$NICS$NIC,$RX,$TX;"
+
+    # Individual NIC IP addresses
+    IPv4="$IPv4$NIC,$(ip -4 addr show "$NIC" | grep -oP 'inet \K[\d.]+' | sed 's/ /,/g');"
+    IPv6="$IPv6$NIC,$(ip -6 addr show "$NIC" | grep -w "global" | grep -oP 'inet6 \K[0-9a-fA-F:]+' | sed 's/ /,/g');"
+
+    # Individual NIC MAC address
+    MAC="$MAC$NIC,$(ip link show "$NIC" | awk '/ether/ {print $2}');"
 done
 NICS=$(echo -ne "$NICS" | sed 's/ //g')
 IPv4=$(echo -ne "$IPv4" | sed 's/ //g')
 IPv6=$(echo -ne "$IPv6" | sed 's/ //g')
+MAC=$(echo -ne "$MAC" | sed 's/ //g')
 
 # Port connections
 CONN=""
@@ -530,9 +542,9 @@ Date=$(echo $currentDateTime | awk -F_ '{print $1}')
 Time=$(echo $currentDateTime | awk -F_ '{print $2}')
 
 # Prepare data
-json='{"SID":"'"$SID"'","UID":"'"$User_ID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","date":"'"$Date"'","time":"'"$Time"'","location":"'"$Location"'","Vendor":"'"$sysVendor"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'"}'
+json='{"SID":"'"$SID"'","UID":"'"$User_ID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","date":"'"$Date"'","time":"'"$Time"'","location":"'"$Location"'","Vendor":"'"$sysVendor"'","TotalUsers":"'"$total_users"'","TotalStorage":"'"$total_storage"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","MacAddress":"'"$MAC"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'"}'
 
-Filename="cloudnexus_agent_$Date_$Time.log"
+Filename="cloudnexus_agent_$Date_$Time.log"																																																						
 
 # Save data to file
 echo "$json" > "$ScriptPath"/"$Filename"
