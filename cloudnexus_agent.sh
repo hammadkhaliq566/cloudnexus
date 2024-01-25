@@ -443,7 +443,7 @@ RAMCache=$(echo | awk "{print $tRAMCache / $X}")
 DISKs=$(echo -ne "$(timeout 3 df -Th | sed 1d | awk '{print $(NF)","$1","$2","$3","$4","$5","$6";"}')" | sed 's/ //g'  | sed 's/ //g')
 
 # Disks inodes Usage
-INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | awk '{print $(NF)","$1","$2","$3","$4","$5","$6";"}')" | sed 's/ //g' | sed 's/ //g')
+INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | awk '{print $(NF)","$1","$2","$3","$4","$5","$6","$7";"}')" | sed 's/ //g' | sed 's/ //g')
 
 # Disks IOPS
 IOPS=""
