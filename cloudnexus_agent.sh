@@ -440,10 +440,10 @@ RAMBuff=$(echo | awk "{print $tRAMBuff / $X}")
 RAMCache=$(echo | awk "{print $tRAMCache / $X}")
 
 # Disks usage
-DISKs=$(echo -ne "$(timeout 3 df -TPB1 | sed 1d | grep -v -E 'tmpfs' | awk '{print $(NF)","$2","$3","$4","$5";"}')" | sed 's/ //g'  | sed 's/ //g')
+DISKs=$(echo -ne "$(timeout 3 df -Th | sed 1d | awk '{print $(NF)","$2","$3","$4","$5","$6";"}')" | sed 's/ //g'  | sed 's/ //g')
 
 # Disks inodes Usage
-INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | grep -v -E 'tmpfs' | awk '{print $(NF)","$3","$4","$5";"}')" | sed 's/ //g' | sed 's/ //g')
+INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | awk '{print $(NF)","$2","$3","$4","$5","$6";"}')" | sed 's/ //g' | sed 's/ //g')
 
 # Disks IOPS
 IOPS=""
@@ -550,7 +550,7 @@ Filename="cloudnexus_agent_$Date_$Time.log"
 echo "$json" > "$ScriptPath"/"$Filename"
 
 # Post data
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://9f32-2400-adc5-154-f400-c1d7-dc85-da0e-975c.ngrok-free.app/api/user/addServer/ &> /dev/null
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json" https://4942-2400-adc5-154-f400-d0f3-d923-1f66-3e4e.ngrok-free.app/api/user/addServer/ &> /dev/null
 
 if [ $? -eq 0 ]; then
     echo "Data posted successfully!"
