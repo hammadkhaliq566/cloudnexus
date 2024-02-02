@@ -445,6 +445,13 @@ DISKs=$(echo -ne "$(timeout 3 df -Th | sed 1d | awk '{print $(NF)","$1","$2","$3
 # Disks inodes Usage
 INODEs=$(echo -ne "$(timeout 3 df -Ti | sed 1d | awk '{print $(NF)","$1","$2","$3","$4","$5","$6","$7";"}')" | sed 's/ //g' | sed 's/ //g')
 
+# Average Disk Usages
+AVGDISKUsage=$(df -h | awk '{if (NR!=1) sum+=$5} END {print sum/(NR-1)}')
+
+# Processes Count
+PROCESSCOUNT=$(ps aux | wc -l)
+
+
 # Disks IOPS
 IOPS=""
 diskstats=$(cat /proc/diskstats)
@@ -542,7 +549,7 @@ Date=$(echo $currentDateTime | awk -F_ '{print $1}')
 Time=$(echo $currentDateTime | awk -F_ '{print $2}')
 
 # Prepare data
-json='{"SID":"'"$SID"'","UID":"'"$User_ID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","date":"'"$Date"'","time":"'"$Time"'","location":"'"$Location"'","Vendor":"'"$sysVendor"'","totalusers":"'"$total_users"'","totalstorage":"'"$total_storage"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","macaddress":"'"$MAC"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'"}'
+json='{"SID":"'"$SID"'","UID":"'"$User_ID"'","agent":"0","user":"'"$User"'","os":"'"$OS"'","kernel":"'"$Kernel"'","hostname":"'"$Hostname"'","date":"'"$Date"'","time":"'"$Time"'","location":"'"$Location"'","Vendor":"'"$sysVendor"'","totalusers":"'"$total_users"'","totalstorage":"'"$total_storage"'","avgdiskusage":"'"$AVGDISKUsage"'","processcount":"'"$PROCESSCOUNT"'","reqreboot":"'"$RequiresReboot"'","uptime":"'"$Uptime"'","cpumodel":"'"$CPUModel"'","cpusockets":"'"$CPUSockets"'","cpucores":"'"$CPUCores"'","cputhreads":"'"$CPUThreads"'","cpuspeed":"'"$CPUSpeed"'","cpu":"'"$CPU"'","wa":"'"$CPUwa"'","st":"'"$CPUst"'","us":"'"$CPUus"'","sy":"'"$CPUsy"'","load1":"'"$loadavg1"'","load5":"'"$loadavg5"'","load15":"'"$loadavg15"'","ramsize":"'"$RAMSize"'","ram":"'"$RAM"'","ramswapsize":"'"$RAMSwapSize"'","ramswap":"'"$RAMSwap"'","rambuff":"'"$RAMBuff"'","ramcache":"'"$RAMCache"'","disks":"'"$DISKs"'","inodes":"'"$INODEs"'","iops":"'"$IOPS"'","nics":"'"$NICS"'","ipv4":"'"$IPv4"'","ipv6":"'"$IPv6"'","macaddress":"'"$MAC"'","conn":"'"$CONN"'","temp":"'"$TEMP"'","serv":"'"$SRVCS"'","cust":"'"$CV"'"}'
 
 Filename="cloudnexus_agent_$Date_$Time.log"																																																						
 
