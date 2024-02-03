@@ -556,7 +556,7 @@ Filename="cloudnexus_agent_$Date_$Time.log"
 echo "$json" > "$ScriptPath"/"$Filename"
 
 # Post data
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json"  https://3d2a-72-255-40-12.ngrok-free.app/api/user/addServer/ &> /dev/null
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json"  https://33ea-223-123-5-81.ngrok-free.app/api/user/addServer/ &> /dev/null
 
 if [ $? -eq 0 ]; then
     echo "Data posted successfully!"
