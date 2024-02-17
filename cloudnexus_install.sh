@@ -189,7 +189,7 @@ json_response='{"status":"'"$status_code"'","UID":"'"$User_ID"'"}'
 # Print JSON response
 echo "$json_response"
 
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data "$json_response" https://836c-2400-adc5-154-f400-e001-619d-c35b-363e.ngrok-free.app/api/user/installServer/ &> /dev/null
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data "$json_response" https://a791-58-27-213-34.ngrok-free.app/api/user/installServer/ &> /dev/null
 echo "... done."
 
 # Cleaning up install file
