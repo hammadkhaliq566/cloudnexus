@@ -75,7 +75,7 @@ json_response='{"status":"'"$status_code"'","SID":"'"$SID"'","UID":"'"$User_Id"'
 # Let cloudnexus platform know uninstall has been completed
 # echo "Letting cloudnexus platform know the uninstallation has been completed..."
 
-wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json_response" https://a791-58-27-213-34.ngrok-free.app/api/user/uniinstallServer/ &> /dev/null
+wget --retry-connrefused --waitretry=1 -t 3 -T 15 -qO- --header="Content-Type: text/plain" --post-data="$json_response" https://42d9-37-111-180-227.ngrok-free.app/api/user/uninstallServer/ &> /dev/null
 # echo "... done."
 
 # All done
